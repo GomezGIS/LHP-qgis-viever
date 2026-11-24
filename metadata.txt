@@ -1,0 +1,14 @@
+[general]
+name=LHP Viewer
+qgisMinimumVersion=3.28
+version=0.1a
+author=GomezGIS
+description=LHP/LHO XML Viewer
+email=
+about=Diagnostic viewer for LHP XML files
+
+category=Plugins
+icon=icon.png
+
+experimental=True
+deprecated=False
