@@ -1,22 +1,29 @@
-from qgis.PyQt.QtWidgets import QAction, QFileDialog, QMessageBox
-import xml.etree.ElementTree as ET
-import os
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QFileDialog,
+    QMessageBox
+)
+
+from core.xml_parser import XMLParser
 
 
 class LHPViewerPlugin:
 
     def __init__(self, iface):
+
         self.iface = iface
         self.action = None
 
     def initGui(self):
 
         self.action = QAction(
-            "LHP XML Diagnostic Import",
+            "LHP XML Diagnostic",
             self.iface.mainWindow()
         )
 
-        self.action.triggered.connect(self.run)
+        self.action.triggered.connect(
+            self.run
+        )
 
         self.iface.addPluginToMenu(
             "LHP Viewer",
@@ -26,6 +33,7 @@ class LHPViewerPlugin:
     def unload(self):
 
         if self.action:
+
             self.iface.removePluginMenu(
                 "LHP Viewer",
                 self.action
@@ -45,43 +53,20 @@ class LHPViewerPlugin:
 
         try:
 
-            tree = ET.parse(xml_file)
-            root = tree.getroot()
+            parser = XMLParser(xml_file)
 
-            psk_count = len(root.findall(".//PSK"))
-
-            log_file = os.path.join(
-                os.path.dirname(xml_file),
-                "lhp_import.log"
-            )
-
-            with open(
-                log_file,
-                "w",
-                encoding="utf-8"
-            ) as log:
-
-                log.write(
-                    "LHP Viewer Diagnostic 0.1a\n"
-                )
-                log.write(
-                    f"XML: {xml_file}\n"
-                )
-                log.write(
-                    f"PSK count: {psk_count}\n"
-                )
+            psk_count = parser.count_psk()
 
             QMessageBox.information(
                 None,
                 "LHP Viewer",
-                f"Nalezeno PSK: {psk_count}\n\n"
-                f"Log:\n{log_file}"
+                f"Nalezeno PSK: {psk_count}"
             )
 
         except Exception as e:
 
             QMessageBox.critical(
                 None,
-                "LHP Viewer Error",
+                "LHP Error",
                 str(e)
             )
